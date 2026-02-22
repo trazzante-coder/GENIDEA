@@ -1,0 +1,492 @@
+:root { --bg: #fdfbf7; --noir: #000; }
+
+* { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+body { 
+    margin: 0; background: var(--bg); font-family: 'Montserrat', sans-serif; 
+    height: 100dvh; display: flex; flex-direction: column; overflow: hidden; 
+}
+
+/* LE HAUT (TITRE) */
+.top-bar { padding: 40px 20px 0; text-align: center; }
+.top-bar h1 { font-size: 2.2rem; line-height: 0.8; margin: 0; font-weight: 900; letter-spacing: -2px; }
+.tagline { font-size: 0.55rem; letter-spacing: 3px; margin-top: 10px; opacity: 0.4; }
+
+/* --- LE CONTENEUR (MILIEU) --- */
+.carousel-section {
+    flex: 1;
+    width: 100%; /* Important pour que le centre soit le milieu de l'écran */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 1200px;
+    position: relative;
+    overflow: visible; /* Laisse les cartes de côté respirer */
+    margin-top: -150px;
+}
+/* --- LA SCENE (POINT MORT CENTRAL) --- */
+.scene {
+    /* Ces dimensions doivent correspondre exactement à la largeur d'une carte */
+    width: 250px; 
+    height: 380px;
+    position: relative;
+    transform-style: preserve-3d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* On retire tout décalage manuel */
+    margin: 0 auto; 
+    transform: rotateX(-4deg);
+}
+.carousel { width: 100%; height: 100%; position: absolute; transform-style: preserve-3d; transform: rotateX(-4deg); transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1); }
+
+.item {
+    position: absolute; width: 100%; height: 100%; background: #fff;
+    border: 1px solid rgba(0,0,0,0.1); border-radius: 30px; display: flex;
+    align-items: center; justify-content: center; padding: 30px;
+    backface-visibility: visible; box-shadow: 0 15px 40px rgba(0,0,0,0.06);
+    /* ... tes codes actuels ... */
+    transition: transform 0.7s, opacity 0.7s, border-top 0.4s; /* On ajoute border-top ici */
+}
+
+.item:not(.active) { filter: grayscale(1) blur(1px); opacity: 0.25; }
+
+.card-content { text-align: center; }
+/* Style de base des icônes */
+.card-content i {
+    font-size: 3.5rem;
+    display: block;
+    margin-bottom: 25px;
+    transition: all 0.4s ease;
+    filter: drop-shadow(0 2px 5px rgba(0,0,0,0.1));
+}
+
+/* Couleurs spécifiques par carte */
+.item:nth-child(1) i { color: #8E44AD; } /* Générateur : Violet Royal */
+.item:nth-child(2) i { color: #2E86C1; } /* Chrono : Bleu Électrique */
+.item:nth-child(3) i { color: #D4AC0D; } /* Challenge : Or Prestige */
+.item:nth-child(4) i { color: #27AE60; } /* Check : Vert Émeraude */
+.item:nth-child(5) i { color: #E74C3C; } /* Profil : Rouge Rubis */
+
+/* Effet sur la carte active : Elle brille de sa propre couleur */
+.item.active:nth-child(1) { border-top: 5px solid #8E44AD; }
+.item.active:nth-child(2) { border-top: 5px solid #2E86C1; }
+.item.active:nth-child(3) { border-top: 5px solid #D4AC0D; }
+.item.active:nth-child(4) { border-top: 5px solid #27AE60; }
+.item.active:nth-child(5) { border-top: 5px solid #E74C3C; }
+
+/* Animation de flottement pour la carte active (côté addictif) */
+.item.active i {
+    animation: iconFloat 2.5s ease-in-out infinite;
+}
+
+@keyframes iconFloat {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-8px) scale(1.05); }
+}
+.card-content h3 { font-size: 0.9rem; letter-spacing: 5px; margin: 0; font-weight: 900; }
+.card-content p { font-size: 0.6rem; letter-spacing: 2px; margin-top: 15px; opacity: 0.3; }
+
+/* --- LE BAS (NAVIGATION ET POINTS) --- */
+/* On supprime les marges parasites du bas */
+.bottom-bar { 
+    display: none; /* On ne se sert plus de ce conteneur qui bloque le flux */
+}
+
+/* --- LE BAS (NAVIGATION ET POINTS) --- */
+/* On s'assure que le footer ne bloque rien s'il existe encore */
+.bottom-bar { 
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    pointer-events: none; 
+}
+
+/* --- NAVIGATION & POINTS (FORCE APPRAITION) --- */
+.nav-btn {
+    position: fixed !important;
+    top: 50% !important;
+    transform: translateY(-50%);
+    width: 60px;
+    height: 60px;
+    background: #000 !important;
+    color: #fff !important;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 99999; /* Devant la carte */
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+/* Sur PC : On les plaque aux bords de la fenêtre */
+.nav-btn.left { left: 30px; }
+.nav-btn.right { right: 30px; }
+
+.dots {
+    position: fixed !important;
+    bottom: 40px !important;
+    left: 50% !important;
+    transform: translateX(-50%);
+    display: flex !important;
+    gap: 12px;
+    z-index: 99999;
+}
+
+.dot { width: 8px; height: 8px; background: #000; border-radius: 50%; opacity: 0.15; transition: 0.3s; }
+.dot.active { opacity: 1; width: 22px; border-radius: 10px; }
+
+/* --- ADAPTATION MOBILE (TES SCREENS GSM) --- */
+@media (max-width: 768px) {
+    .nav-btn {
+        top: auto !important;
+        bottom: 30px !important; /* On les descend tout en bas */
+        transform: none;
+        width: 50px;
+        height: 50px;
+    }
+
+    /* On les écarte du centre pour laisser les points respirer */
+    .nav-btn.left { left: 20px; }
+    .nav-btn.right { right: 20px; }
+
+    .dots {
+        bottom: 48px !important; /* Juste au dessus des flèches */
+    }
+}
+/* --- COULEURS PRESTIGE --- */
+
+/* On donne une couleur unique à chaque icône */
+.item:nth-child(1) i { color: #8E44AD !important; } /* Violet - Générateur */
+.item:nth-child(2) i { color: #2E86C1 !important; } /* Bleu - Chrono */
+.item:nth-child(3) i { color: #D4AC0D !important; } /* Or - Challenge */
+.item:nth-child(4) i { color: #27AE60 !important; } /* Vert - Check */
+.item:nth-child(5) i { color: #E74C3C !important; } /* Rouge - Profil */
+
+/* On ajoute une barre de couleur en haut de la carte SEULEMENT quand elle est active */
+.item.active:nth-child(1) { border-top: 6px solid #8E44AD !important; }
+.item.active:nth-child(2) { border-top: 6px solid #2E86C1 !important; }
+.item.active:nth-child(3) { border-top: 6px solid #D4AC0D !important; }
+.item.active:nth-child(4) { border-top: 6px solid #27AE60 !important; }
+.item.active:nth-child(5) { border-top: 6px solid #E74C3C !important; }
+
+/* --- OVERLAY DE CONTENU (FENÊTRE QUI S'OUVRE) --- */
+.overlay {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #fdfbf7; /* Fond assorti à ton site */
+    z-index: 2000000; /* Doit être au-dessus de TOUT */
+    display: none; /* Caché par défaut */
+    flex-direction: column;
+    padding: 60px 30px;
+    overflow-y: auto;
+    animation: slideIn 0.4s ease-out;
+}
+
+/* Quand l'overlay est actif, on l'affiche */
+.overlay.active {
+    display: flex !important;
+}
+
+.close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 2.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 900;
+    z-index: 2000001; /* Doit être plus élevé que le z-index de l'overlay */
+    color: #000;
+    
+}
+
+/* Style des titres à l'intérieur de l'overlay */
+.category-title { font-weight: 900; font-size: 2rem; margin-bottom: 5px; letter-spacing: -1px; }
+.category-subtitle { opacity: 0.4; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 30px; }
+
+/* Animation d'entrée */
+@keyframes slideIn {
+    from { transform: translateY(50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+.generator-grid {
+    display: flex;
+    gap: 20px;
+    margin-top: 30px;
+    overflow-x: auto; /* Permet de scroller les colonnes sur mobile */
+    padding-bottom: 20px;
+}
+
+.column {
+    flex: 1;
+    min-width: 140px;
+}
+
+.column h4 {
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+
+/* Les petites cases sélectionnables */
+.chip {
+    padding: 10px 15px;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.chip:hover { border-color: #000; }
+
+.chip.active {
+    background: #000;
+    color: #fff;
+    border-color: #000;
+    transform: scale(1.05);
+}
+
+.launch-btn {
+    margin-top: 40px;
+    width: 100%;
+    padding: 20px;
+    background: #000;
+    color: #fff;
+    border: none;
+    border-radius: 15px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    cursor: pointer;
+}
+/* Menu de sélection des colonnes */
+.selector-menu {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.col-btn {
+    padding: 8px 12px;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+    background: white;
+    font-size: 0.7rem;
+    cursor: pointer;
+}
+
+.col-btn.active {
+    background: #000;
+    color: #fff;
+    border-color: #000;
+}
+
+/* Les slots */
+.slots-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.slot-box {
+    display: flex;
+    align-items: center;
+    background: white;
+    padding: 10px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    height: 80px;
+    position: relative;
+    transition: 0.3s;
+}
+
+.slot-box.locked { background: #f0f0f0; border: 1px solid #000; }
+
+.slot-label { width: 80px; font-size: 0.6rem; font-weight: 900; opacity: 0.5; }
+
+.reel-container {
+    flex: 1;
+    height: 60px;
+    overflow: hidden; /* Cache les autres options */
+    text-align: center;
+}
+
+.reel {
+    transition: transform 1.5s cubic-bezier(0.1, 0.9, 0.1, 1);
+}
+
+.option {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.lock-btn {
+    background: #eee;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 0.6rem;
+    cursor: pointer;
+}
+/* --- INTERFACE CHRONO --- */
+.chrono-setup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+}
+
+/* --- CERCLE DE PROGRESSION --- */
+.timer-container {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px 0;
+}
+
+svg.timer-svg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg); /* Pour que le cercle commence en haut */
+}
+
+circle.bg-circle {
+    fill: none;
+    stroke: #eee;
+    stroke-width: 4;
+}
+
+circle.progress-bar {
+    fill: none;
+    stroke: #000;
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-dasharray: 440; /* Périmètre du cercle (2 * PI * r) */
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1s linear;
+}
+
+.timer-circle {
+    font-size: 1.2rem; /* Chiffres plus petits */
+    font-weight: 400;
+    color: #888; /* Couleur plus discrète */
+    font-family: monospace;
+    z-index: 2;
+}
+
+.challenge-display {
+    width: 100%;
+    min-height: 100px;
+    background: #f8f8f8;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    text-align: center;
+    border: 1px inset rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.challenge-display.active {
+    background: #000;
+    color: #fff;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.time-presets {
+    display: flex;
+    gap: 10px;
+}
+
+.time-btn {
+    padding: 10px 20px;
+    border-radius: 50px;
+    border: 1px solid #000;
+    background: transparent;
+    cursor: pointer;
+    font-weight: 700;
+    transition: 0.2s;
+}
+
+.time-btn:hover {
+    background: #000;
+    color: #fff;
+}
+@keyframes bounceIn {
+    0% { transform: scale(0.9); opacity: 0; }
+    60% { transform: scale(1.05); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.challenge-display.active h3 {
+    animation: bounceIn 0.5s ease-out forwards;
+    color: #FFD700; /* Texte en Or */
+    font-size: 1.5rem;
+}
+
+.launch-btn {
+    transition: all 0.3s ease;
+}
+
+.launch-btn:active {
+    transform: scale(0.9);
+}
+/* Conteneur pour aligner les options de reset proprement */
+#reset-options {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+    animation: fadeIn 0.3s ease-in;
+}
+
+/* Style des boutons secondaires (Recommencer / Nouveau) */
+.btn-secondary {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Bordure discrète sur fond noir */
+    color: rgba(255, 255, 255, 0.8);
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-secondary:hover {
+    border-color: #FFD700; /* Rappel de l'or au survol */
+    color: #FFD700;
+    background: rgba(255, 215, 0, 0.05);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+
