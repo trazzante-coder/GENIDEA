@@ -77,37 +77,91 @@ function openCard(index) {
     const dataZone = document.getElementById('category-data');
     dataZone.innerHTML = ""; 
 
-    if (index === 0) {
-        renderGenerator(dataZone); 
-    } 
-    else if (index === 1) {
-        renderChrono(dataZone);
-    } 
-    else {
-        const categories = ["GÉNÉRATEUR", "CHRONO", "CHALLENGE", "CHECK", "PROFIL"];
+    if (index === 0) renderGenerator(dataZone); 
+    else if (index === 1) renderChrono(dataZone);
+    else if (index === 2) { // CHALLENGE
         dataZone.innerHTML = `
-            <h2 class="category-title">${categories[index]}</h2>
-            <p class="category-subtitle">Contenu à venir...</p>
-        `;
+            <h2 class="category-title">CHALLENGES</h2>
+            <div class="card-mini">
+                <span class="timer-badge">⏳ 14H 22M</span>
+                <h3>DÉFI 24H</h3>
+                <p class="theme-highlight">"${MODES.drawing.allColumns[0].i[0]} en plein désert"</p>
+                <button class="launch-btn">PARTICIPER</button>
+            </div>
+            <div class="card-mini" style="margin-top:20px;">
+                <h3>LE CERCLE DES 200</h3>
+                <p style="font-size:0.8rem">192 / 200 participants</p>
+                <div class="progress-container"><div class="progress-bar" style="width:92%"></div></div>
+                <button class="launch-btn" style="background:#D4AC0D">REJOINDRE</button>
+            </div>`;
+    }
+        else if (index === 3) { // GALERIE (Le Cercle des 200)
+        const gagnants = [
+            { art: "Aiko_Draw", défi: "Samouraï / Futur", img: 55 },
+            { art: "Mecha_Design", défi: "Robot / Désert", img: 58 },
+            { art: "Cyber_Punk", défi: "Cyborg / Pluie", img: 62 },
+            { art: "Pixel_Master", défi: "Chevalier / Forêt", img: 70 }
+        ];
+
+        dataZone.innerHTML = `
+            <h2 class="category-title">GALERIE</h2>
+            <p class="category-subtitle">Les Maîtres du Cercle</p>
+            <div class="grille-prestige">
+                ${gagnants.map(g => `
+                    <div class="gallery-card">
+                        <div class="gallery-img-container">
+                            <img src="https://picsum.photos/seed/${g.img}/300" alt="Dessin">
+                            <div class="artist-tag">👤 ${g.art}</div>
+                        </div>
+                        <div class="challenge-info">
+                            <span>DÉFI</span>
+                            <p>${g.défi}</p>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>`;
+    }
+
+    else if (index === 4) { // PROFIL
+        dataZone.innerHTML = `
+            <h2 class="category-title">PROFIL</h2>
+            <div class="avatar-circle" style="background:#E74C3C; width:80px; height:80px; margin:20px auto; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:2rem;">👤</div>
+            <textarea id="notes-profil" class="notes-prestige" placeholder="Tes notes d'artiste..."></textarea>`;
+        
+        const notes = document.getElementById('notes-profil');
+        notes.value = localStorage.getItem('notesPrestige') || "";
+        notes.oninput = () => localStorage.setItem('notesPrestige', notes.value);
     }
     overlay.classList.add('active');
 }
 
 function renderGenerator(container) {
+    // 1. On prépare le début de la carte (Titre et Menu de sélection)
     let menuHtml = `
         <h2 class="category-title">GÉNÉRATEUR</h2>
         <p class="category-subtitle">Configurez vos colonnes</p>
         <div class="selector-menu">`;
     
+    // 2. On crée les petits boutons (Sujet, Action...) pour choisir ses colonnes
     MODES.drawing.allColumns.forEach(col => {
         const activeClass = selectedCols.includes(col.id) ? 'active' : '';
         menuHtml += `<button class="col-btn ${activeClass}" onclick="toggleColumn('${col.id}')">${col.l}</button>`;
     });
 
-    menuHtml += `</div><div id="active-slots" class="slots-container"></div>
-                 <button class="launch-btn" onclick="spinSlots()">LANCER LE TIRAGE</button>`;
+    // 3. On ferme le menu et on prépare la zone où les slots vont s'afficher
+    // C'est ici qu'on ajoute notre nouveau groupe de boutons (LANCER + AUTO)
+    menuHtml += `</div>
+                 <div id="active-slots" class="slots-container"></div>
+                 
+                 <div class="btn-group-gen" style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="launch-btn" style="flex: 3; margin-top:0;" onclick="spinSlots()">✨ LANCER LE TIRAGE</button>
+                    <button class="auto-btn-prestige" style="flex: 1; background: #eee; border: none; border-radius: 15px; cursor: pointer; font-size: 1.2rem;" onclick="genererAutoPrestige()">🎲 AUTO</button>
+                 </div>`;
     
+    // 4. On injecte tout le texte HTML d'un coup dans l'overlay
     container.innerHTML = menuHtml;
+
+    // 5. On demande à l'autre fonction de dessiner les slots (les rouleaux)
     renderSlots();
 }
 
@@ -337,3 +391,27 @@ function resetTimer() {
     const resetBtn = document.getElementById('reset-btn');
     if (resetBtn) resetBtn.remove();
 }
+
+function genererAutoPrestige() {
+    // 1. On récupère tous les IDs de colonnes sauf le "sujet"
+    const otherIds = MODES.drawing.allColumns
+        .map(c => c.id)
+        .filter(id => id !== "sujet");
+    
+    // 2. On décide d'un nombre aléatoire d'options SUPPLÉMENTAIRES (entre 1 et 5)
+    // + le sujet, ça fera entre 2 et 6 colonnes au total
+    const nbOptions = Math.floor(Math.random() * 5) + 1; 
+    
+    // 3. On mélange les autres colonnes et on en pioche 'nbOptions'
+    const shuffledExtras = otherIds.sort(() => 0.5 - Math.random()).slice(0, nbOptions);
+    
+    // 4. On définit selectedCols avec le Sujet TOUJOURS présent + les extras
+    selectedCols = ["sujet", ...shuffledExtras];
+    
+    // 5. On rafraîchit l'affichage du générateur
+    renderGenerator(document.getElementById('category-data'));
+    
+    // 6. On lance le spin après un court délai pour l'effet visuel
+    setTimeout(spinSlots, 100);
+}
+
