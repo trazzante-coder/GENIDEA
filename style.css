@@ -1,4 +1,4 @@
-:root { --bg: #fdfbf7; --noir: #000; }
+content://com.android.externalstorage.documents/document/primary%3AGENIDEA%2Fstyle.css:root { --bg: #fdfbf7; --noir: #000; }
 
 * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
 body { 
@@ -488,5 +488,249 @@ circle.progress-bar {
     from { opacity: 0; transform: translateY(5px); }
     to { opacity: 1; transform: translateY(0); }
 }
+/* --- INJECTION DES COULEURS ADDICTIVES (BACK TO GLASS) --- */
+
+/* 1. L'Overlay devient sombre et stylé */
+.overlay {
+    background: radial-gradient(circle at top, #1a1a2e, #0f0f1a) !important;
+    color: white !important;
+}
+
+.category-title { color: #fff !important; }
+.category-subtitle { color: #a855f7 !important; opacity: 1 !important; font-weight: bold; }
+.close-btn { color: white !important; }
+
+/* 2. Les Cartes deviennent des "Glass Cards" */
+.card-mini, .slot-box, .challenge-display, .notes-area {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(10px);
+    color: white !important;
+}
+
+/* 3. Le bouton LANCER reprend son dégradé violet */
+.launch-btn {
+    background: linear-gradient(135deg, #a855f7, #6e2cf2) !important;
+    box-shadow: 0 10px 20px rgba(168, 85, 247, 0.3) !important;
+    border: none !important;
+    color: white !important;
+}
+
+/* 4. Les Pilules / Boutons de sélection */
+.col-btn {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.col-btn.active {
+    background: #a855f7 !important;
+    color: white !important;
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
+}
+
+/* 5. Le bouton AUTO (Gris translucide) */
+.auto-btn-prestige {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+/* 6. La Galerie & Profil */
+.img-win, .avatar-circle {
+    border: 2px solid rgba(168, 85, 247, 0.3) !important;
+}
+
+#notes-profil {
+    background: rgba(0, 0, 0, 0.2) !important;
+    color: #eee !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* 7. L'accordéon du profil */
+.accordion-header {
+    background: rgba(168, 85, 247, 0.1) !important;
+    border: 1px solid rgba(168, 85, 247, 0.2) !important;
+    color: white !important;
+}
+/* --- TRANSFORMATION DU HUB (ACCUEIL) --- */
+
+/* 1. Le fond de l'application passe en mode sombre profond */
+body {
+    background: radial-gradient(circle at center, #1a1a2e 0%, #0f0f1a 100%) !important;
+    color: white !important;
+}
+
+/* 2. Le Titre "GENIDEA" devient lumineux */
+.top-bar h1 {
+    color: white;
+    text-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+}
+.tagline {
+    color: #a855f7 !important;
+    opacity: 1 !important;
+    font-weight: bold;
+}
+
+/* 3. Les Cartes du Carousel (Mode Glassmorphism) */
+.item {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3) !important;
+    color: white !important;
+}
+
+/* 4. Intensifier la lueur de la carte active */
+.item.active {
+    background: rgba(168, 85, 247, 0.05) !important;
+    border: 1px solid rgba(168, 85, 247, 0.4) !important;
+    box-shadow: 0 0 30px rgba(168, 85, 247, 0.2) !important;
+}
+
+.card-content h3 {
+    color: white !important;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.card-content p {
+    color: #a855f7 !important;
+    opacity: 1 !important;
+}
+
+/* 5. Les boutons de navigation et les points */
+.nav-btn {
+    background: rgba(168, 85, 247, 0.2) !important;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(168, 85, 247, 0.3) !important;
+}
+
+.dot {
+    background: white !important;
+    opacity: 0.2 !important;
+}
+
+.dot.active {
+    background: #a855f7 !important;
+    opacity: 1 !important;
+    box-shadow: 0 0 10px #a855f7;
+}
+/* --- STYLE CARTES GALERIE --- */
+.grille-prestige {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Deux colonnes sur mobile/PC */
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.gallery-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 18px;
+    overflow: hidden;
+    transition: 0.3s;
+}
+
+.gallery-img-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+}
+
+.gallery-img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.artist-tag {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    color: white;
+    font-size: 0.6rem;
+    padding: 4px 8px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.challenge-info {
+    padding: 10px;
+}
+
+.challenge-info span {
+    font-size: 0.5rem;
+    color: #a855f7;
+    font-weight: 900;
+    letter-spacing: 1px;
+}
+
+.challenge-info p {
+    font-size: 0.7rem;
+    margin: 2px 0 0 0;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Coupe le texte proprement s'il est trop long */
+}
+
+.gallery-card:hover {
+    transform: translateY(-5px);
+    border-color: #a855f7;
+}
+.auto-btn-prestige:active {
+    background: #a855f7 !important;
+    box-shadow: 0 0 20px #a855f7;
+    transform: scale(0.9);
+}/* Quand la box est verrouillée */
+.slot-box.locked {
+    background: rgba(168, 85, 247, 0.15) !important; /* Teinte violette translucide */
+    border: 1px solid #a855f7 !important; /* Bordure violette lumineuse */
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.2);
+}
+
+/* Le bouton FIXER quand il est actif */
+.slot-box.locked .lock-btn {
+    background: #a855f7 !important;
+    color: white !important;
+    font-weight: bold;
+}
+
+/* On change le texte du bouton dynamiquement via CSS (astuce) */
+.slot-box.locked .lock-btn::after {
+    content: " ✅";
+}
+
+/* Désactive l'effet de survol sur une colonne bloquée pour bien montrer qu'elle ne bougera plus */
+.slot-box.locked .reel {
+    opacity: 0.8;
+}
+/* Quand la box est verrouillée */
+.slot-box.locked {
+    background: rgba(168, 85, 247, 0.15) !important; /* Teinte violette translucide */
+    border: 1px solid #a855f7 !important; /* Bordure violette lumineuse */
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.2);
+}
+
+/* Le bouton FIXER quand il est actif */
+.slot-box.locked .lock-btn {
+    background: #a855f7 !important;
+    color: white !important;
+    font-weight: bold;
+}
+
+/* On change le texte du bouton dynamiquement via CSS (astuce) */
+.slot-box.locked .lock-btn::after {
+    content: " ✅";
+}
+
+/* Désactive l'effet de survol sur une colonne bloquée pour bien montrer qu'elle ne bougera plus */
+.slot-box.locked .reel {
+    opacity: 0.8;
+}
+
+
 
 
