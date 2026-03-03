@@ -8,7 +8,7 @@ let timerId = null; // Cette variable va stocker le compte à rebours pour pouvo
 function init() {
     const gapAngle = 360 / items.length;
     // On réduit encore un peu le TZ sur mobile pour que les cartes de côté ne touchent pas les bords
-    const tz = window.innerWidth < 768 ? 200 : 500; 
+    const tz = window.innerWidth < 768 ? 220 : 500; 
 
     items.forEach((item, i) => {
         const angle = i * gapAngle;
@@ -79,23 +79,119 @@ function openCard(index) {
 
     if (index === 0) renderGenerator(dataZone); 
     else if (index === 1) renderChrono(dataZone);
-    else if (index === 2) { // CHALLENGE
-        dataZone.innerHTML = `
-            <h2 class="category-title">CHALLENGES</h2>
-            <div class="card-mini">
-                <span class="timer-badge">⏳ 14H 22M</span>
-                <h3>DÉFI 24H</h3>
-                <p class="theme-highlight">"${MODES.drawing.allColumns[0].i[0]} en plein désert"</p>
-                <button class="launch-btn">PARTICIPER</button>
+    else if (index === 2) { // SECTION CHALLENGES
+    const cols = MODES.drawing.allColumns;
+    const today = new Date();
+    const dateSeed = today.getDate() + today.getMonth() + today.getFullYear();
+    
+    // 1. Logique de compteur
+    let count200 = parseInt(localStorage.getItem('cercle_count') || "192");
+    let aDejaParticipe = localStorage.getItem('cercle_deja_participe') === "true";
+    const estComplet = count200 >= 200;
+    const pourcentage = Math.min((count200 / 200) * 100, 100);
+
+    const genererPhrase = (seed) => {
+        const S = cols.find(c => c.id === "sujet")?.i || ["Un personnage"];
+        const A = cols.find(c => c.id === "action")?.i || ["qui pose"];
+        const L = cols.find(c => c.id === "lieu")?.i || ["dans un lieu"];
+        
+        const sujet = S[seed % S.length];
+        const action = A[(seed + 1) % A.length];
+        const lieu = L[(seed + 2) % L.length];
+        
+        return `${sujet} ${action} ${lieu}`;
+    };
+
+    const defi24h = genererPhrase(dateSeed);
+    const seedCercle = parseInt(localStorage.getItem('cercle_seed') || "500");
+    const defiCercle = genererPhrase(seedCercle);
+
+    // 2. Injection HTML UNIQUE
+    dataZone.innerHTML = `
+        <h2 class="category-title">CHALLENGES</h2>
+        
+        <div class="card-mini">
+            <span style="font-size: 0.55rem; background: rgba(168, 85, 247, 0.2); color: #a855f7; padding: 4px 8px; border-radius: 8px; float: right; font-weight:900;">24H</span>
+            <h3 style="opacity:0.5; font-size:0.7rem;">AUJOURD'HUI</h3>
+            <p style="font-weight: 900; margin: 15px 0; font-size: 1.1rem; color:#fff;">"${defi24h}"</p>
+            <button class="launch-btn" onclick="closeOverlay()">DESSINER</button>
+        </div>
+
+        <div class="card-mini" style="margin-top: 20px; border: 1px solid ${estComplet ? '#27AE60' : '#D4AC0D'};">
+            <h3 style="color: #D4AC0D; font-size:0.8rem;">LE CERCLE DES 200</h3>
+            <p style="font-size: 0.7rem; margin: 10px 0; opacity: 0.5;">DÉFI :</p>
+            <p style="font-weight: 700; color: #D4AC0D; margin-bottom:10px;">"${defiCercle}"</p>
+            
+            <div onclick="toggleReglement()" style="cursor:pointer; margin-bottom:15px; display:inline-block;">
+                <span style="font-size:0.55rem; color:#D4AC0D; border-bottom:1px dashed #D4AC0D; opacity:0.8;">Lire le règlement du concours</span>
             </div>
-            <div class="card-mini" style="margin-top:20px;">
-                <h3>LE CERCLE DES 200</h3>
-                <p style="font-size:0.8rem">192 / 200 participants</p>
-                <div class="progress-container"><div class="progress-bar" style="width:92%"></div></div>
-                <button class="launch-btn" style="background:#D4AC0D">REJOINDRE</button>
+
+            <div id="reglement-zone" style="display:none; background:rgba(0,0,0,0.3); padding:15px; border-radius:12px; margin-bottom:15px; text-align:left; border:1px solid rgba(212, 172, 13, 0.2);">
+                <h4 style="font-size:0.6rem; color:#D4AC0D; margin-top:0; letter-spacing:1px;">RÈGLES DE L'ATELIER</h4>
+                <ul style="font-size:0.55rem; color:#eee; padding-left:15px; line-height:1.4; margin-bottom:0;">
+                    <li>Une seule participation par artiste.</li>
+                    <li>Le dessin doit inclure TOUS les éléments du défi.</li>
+                    <li>Pas d'IA, uniquement du traditionnel ou digital main.</li>
+                    <li>Le Maître de l'Atelier valide chaque entrée manuellement.</li>
+                    <li>Tous supports autorisés (traditionnel et numérique).</li>
+                </ul>
+            </div>
+
+            <div style="font-size: 0.55rem; display: flex; justify-content: space-between; margin-bottom:5px;">
+                <span>${estComplet ? '🏁 EN ATTENTE DES RÉSULTATS' : `PLACES : ${count200} / 200`}</span>
+                <span>${Math.floor(pourcentage)}%</span>
+            </div>
+            
+            <div style="background: rgba(255,255,255,0.05); height: 6px; border-radius: 10px; overflow: hidden; margin-bottom:20px;">
+                <div style="width: ${pourcentage}%; height: 100%; background: ${estComplet ? '#27AE60' : '#D4AC0D'}; box-shadow: 0 0 10px ${estComplet ? '#27AE60' : '#D4AC0D'}; transition: 0.5s;"></div>
+            </div>
+
+            ${estComplet 
+                ? `<p style="font-size:0.6rem; text-align:center; opacity:0.6;">Le cercle est complet. Le jury examine les créations.</p>` 
+                : aDejaParticipe 
+                    ? `<button class="launch-btn" style="background:rgba(255,255,255,0.1) !important; color:gray !important; cursor:default;">DÉJÀ PARTICIPÉ ✅</button>`
+                    : `<button class="launch-btn" style="background: #D4AC0D !important; border:none;" onclick="ouvrirSoumissionCercle()">REJOINDRE AVEC PHOTO</button>`
+            }
+        </div>`;
+}
+else if (index === 3) { // SECTION ENTRAÎNEMENT
+        const jourIndex = new Date().getDay(); 
+        const tousLesExos = [
+            "Un cube en 3D vue de dessus", "Une sphère avec ombre portée", "Un nez de profil", "Une main ouverte", "Un drapé simple",
+            "Un oeil réaliste", "Une perspective à 2 points", "Un visage d'homme moustachu", "Une oreille", "Un arbre sans feuilles",
+            "Une bouche qui sourit", "Une chaussure de sport", "Un paysage de montagne", "Une main qui tient un crayon", "Un chat assis",
+            "Des hachures croisées", "Un portrait de trois-quarts", "Une voiture simplifiée", "Un escalier en perspective", "Des nuages réalistes",
+            "Une texture de bois", "Une clé ancienne", "Un buste de statue", "Un verre d'eau", "Un autoportrait rapide",
+            "Une rue de ville", "Un crâne humain", "Un animal fantastique", "Une fleur détaillée", "Une plume",
+            "Un drapé sur une chaise", "Un pied", "Un objet en métal", "Une forêt au loin", "Un personnage qui court"
+        ]; // <-- Fermé avec ] et non }
+
+        const depart = (jourIndex === 0 ? 6 : jourIndex - 1) * 5; 
+        const exosDuJour = tousLesExos.slice(depart, depart + 5);
+
+        let htmlExos = "";
+        exosDuJour.forEach((exo, i) => {
+            const estFait = localStorage.getItem(`exo_${jourIndex}_${i}`) === "true";
+            htmlExos += `
+                <div onclick="validerExo(${jourIndex}, ${i})" style="display:flex; align-items:center; background:rgba(255,255,255,0.05); padding:15px; border-radius:12px; margin-bottom:10px; cursor:pointer; border-left: 4px solid ${estFait ? '#27AE60' : '#444'};">
+                    <div style="flex-grow:1;">
+                        <span style="font-size:0.5rem; opacity:0.5;">EXERCICE ${i+1}</span>
+                        <div style="font-size:0.9rem; color:${estFait ? '#27AE60' : '#fff'};">${exo}</div>
+                    </div>
+                    <div>${estFait ? '✅' : '⭕'}</div>
+                </div>`;
+        });
+
+        dataZone.innerHTML = `
+            <h2 class="category-title">ENTRAÎNEMENT</h2>
+            <p style="font-size:0.7rem; opacity:0.6; margin-bottom:20px;">5 exercices quotidiens pour forger ta discipline.</p>
+            ${htmlExos}
+            <div style="margin-top:20px; padding:15px; background:rgba(255,255,255,0.03); border-radius:15px; text-align:center;">
+                <div style="font-size:0.6rem; opacity:0.5;">SÉANCE DE LA SEMAINE</div>
+                <div style="font-size:1.2rem; font-weight:bold;">${typeof calculerTotalSemaine === 'function' ? calculerTotalSemaine() : 0} / 35</div>
             </div>`;
-    }
-        else if (index === 3) { // GALERIE (Le Cercle des 200)
+    } // <-- Fermeture propre de l'index 3
+    else if (index === 4) { // GALERIE
         const gagnants = [
             { art: "Aiko_Draw", défi: "Samouraï / Futur", img: 55 },
             { art: "Mecha_Design", défi: "Robot / Désert", img: 58 },
@@ -121,19 +217,58 @@ function openCard(index) {
                 `).join('')}
             </div>`;
     }
+    else if (index === 5) { // SECTION PROFIL
+    const pseudo = localStorage.getItem('user_pseudo') || "Artiste Anonyme";
+    const styleArt = localStorage.getItem('user_style') || "Non défini";
+    const totalExos = calculerTotalSemaine();
+    const participeCercle = localStorage.getItem('cercle_deja_participe') === "true";
+    
+    // Calcul de la moyenne de génération (simulation basée sur un compteur)
+    const nbGenerations = parseInt(localStorage.getItem('stats_gen_total') || "0");
+    const moyenneHebdo = Math.round(nbGenerations / 4); // Estimation simple
 
-    else if (index === 4) { // PROFIL
-        dataZone.innerHTML = `
-            <h2 class="category-title">PROFIL</h2>
-            <div class="avatar-circle" style="background:#E74C3C; width:80px; height:80px; margin:20px auto; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:2rem;">👤</div>
-            <textarea id="notes-profil" class="notes-prestige" placeholder="Tes notes d'artiste..."></textarea>`;
+    dataZone.innerHTML = `
+        <h2 class="category-title">MON PRESTIGE</h2>
         
-        const notes = document.getElementById('notes-profil');
-        notes.value = localStorage.getItem('notesPrestige') || "";
-        notes.oninput = () => localStorage.setItem('notesPrestige', notes.value);
-    }
-    overlay.classList.add('active');
+        <div style="text-align:center; margin-bottom:20px;">
+            <div onclick="changerAvatar()" style="width:80px; height:80px; background:linear-gradient(45deg, #a855f7, #27AE60); border-radius:50%; margin:0 auto 10px; display:flex; align-items:center; justify-content:center; font-size:2rem; cursor:pointer; border:3px solid rgba(255,255,255,0.1); box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);">
+                ${localStorage.getItem('user_avatar') || '🎨'}
+            </div>
+            <h3 id="display-pseudo" onclick="editerProfil()" style="margin:0; color:#fff; font-size:1.2rem;">${pseudo} <i class="fa-solid fa-pen" style="font-size:0.7rem; opacity:0.5;"></i></h3>
+            <p style="font-size:0.7rem; color:#27AE60; margin-top:5px; letter-spacing:1px;">STYLE : ${styleArt.toUpperCase()}</p>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:20px;">
+            <div class="card-mini" style="padding:10px; text-align:center; background:rgba(255,255,255,0.03);">
+                <span style="font-size:0.6rem; opacity:0.5; display:block;">GÉNÉRATIONS / SEM</span>
+                <strong style="color:#a855f7; font-size:1.2rem;">${moyenneHebdo}</strong>
+            </div>
+            <div class="card-mini" style="padding:10px; text-align:center; background:rgba(255,255,255,0.03);">
+                <span style="font-size:0.6rem; opacity:0.5; display:block;">EXERCICES / 35</span>
+                <strong style="color:#27AE60; font-size:1.2rem;">${totalExos}</strong>
+            </div>
+        </div>
+
+        <div class="card-mini" style="margin-bottom:20px; border-left: 4px solid ${participeCercle ? '#D4AC0D' : '#444'};">
+            <h4 style="font-size:0.7rem; margin:0 0 10px 0; opacity:0.8;">CERCLE DES 200</h4>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:0.8rem;">Statut :</span>
+                <span style="color:${participeCercle ? '#D4AC0D' : '#666'}; font-weight:bold;">
+                    ${participeCercle ? 'INSCRIT ✅' : 'NON INSCRIT ⭕'}
+                </span>
+            </div>
+        </div>
+
+        <textarea id="notes-profil" class="notes-prestige" placeholder="Tes objectifs de la semaine..."></textarea>
+    `;
+
+    // Sauvegarde des notes
+    const notes = document.getElementById('notes-profil');
+    notes.value = localStorage.getItem('notesPrestige') || "";
+    notes.oninput = () => localStorage.setItem('notesPrestige', notes.value);
 }
+   overlay.classList.add('active'); // LA LIGNE QUI OUVRE ENFIN LA FENÊTRE
+} // FIN DE LA FONCTION OPENCARD
 
 function renderGenerator(container) {
     // 1. On prépare le début de la carte (Titre et Menu de sélection)
@@ -414,4 +549,125 @@ function genererAutoPrestige() {
     // 6. On lance le spin après un court délai pour l'effet visuel
     setTimeout(spinSlots, 100);
 }
+// --- FONCTIONS UTILITAIRES ---
 
+function injecterDefi(texte) {
+    // 1. On ferme l'overlay des challenges
+    closeOverlay();
+    
+    // 2. On attend la fin de l'animation de fermeture (300ms)
+    setTimeout(() => {
+        // 3. On ouvre la carte du générateur (index 0)
+        openCard(0);
+        
+        // 4. On prévient l'utilisateur (ou tu peux supprimer l'alert si tu préfères la discrétion)
+        console.log("Défi injecté : " + texte);
+    }, 300);
+}
+function participerCercle() {
+    let count = parseInt(localStorage.getItem('cercle_count') || "192");
+    count++;
+    localStorage.setItem('cercle_count', count);
+
+    // Si on atteint un multiple de 200, le défi va changer automatiquement
+    if (count % 200 === 0) {
+        alert("BRAVO ! L'objectif des 200 est atteint. Nouveau challenge débloqué !");
+    }
+
+    // On rafraîchit l'affichage sans fermer pour voir la barre monter
+    openCard(2); 
+}
+// 1. L'utilisateur tente de rejoindre
+function ouvrirSoumissionCercle() {
+    const confirmation = confirm("RÈGLEMENT : Un seul envoi autorisé. Ton dessin doit respecter strictement le défi. Continuer ?");
+    if(confirmation) {
+        // Ici, on simule l'envoi de la photo
+        alert("Photo envoyée au jury ! Le compteur augmentera après validation.");
+        
+        // On marque que cet utilisateur a déjà participé
+        localStorage.setItem('cercle_deja_participe', "true");
+        
+        // Optionnel : Pour tes tests, tu peux appeler validerDessin() manuellement dans la console
+        openCard(2); // Rafraîchit l'affichage
+    }
+}
+
+// 2. TA FONCTION DE JUGE (À taper dans la console du navigateur pour l'instant)
+// Tape : validerDessin() pour ajouter +1
+// Tape : rejeterDessin() pour libérer la place de l'utilisateur
+function validerDessin() {
+    let count = parseInt(localStorage.getItem('cercle_count') || "0");
+    if (count < 200) {
+        count++;
+        localStorage.setItem('cercle_count', count);
+        console.log("Dessin validé ! Nouveau score : " + count);
+    } else {
+        console.log("Le cercle est déjà plein (200).");
+    }
+}
+
+function rejeterDessin() {
+    // Si tu juges que ce n'est pas bon, on redonne le droit à l'utilisateur de retenter
+    localStorage.setItem('cercle_deja_participe', "false");
+    alert("Dessin refusé par l'atelier. Tu peux soumettre une nouvelle œuvre.");
+}
+
+// 3. FONCTION POUR RESET LE CONCOURS (Quand le concours est fini)
+function nouveauConcoursCercle() {
+    localStorage.setItem('cercle_count', "0");
+    localStorage.setItem('cercle_deja_participe', "false");
+    // On change la graine pour avoir un nouveau défi aléatoire
+    const nouvelleSeed = Math.floor(Math.random() * 1000);
+    localStorage.setItem('cercle_seed', nouvelleSeed);
+    alert("Nouveau concours lancé !");
+}
+function toggleReglement() {
+    const zone = document.getElementById('reglement-zone');
+    if(zone) zone.style.display = (zone.style.display === 'none') ? 'block' : 'none';
+}
+
+function ouvrirSoumissionCercle() {
+    if(confirm("Confirmer l'envoi de ta création au Maître de l'Atelier ?")) {
+        localStorage.setItem('cercle_deja_participe', "true");
+        openCard(2); // On recharge l'affichage
+    }
+}
+function validerExo(jour, i) {
+    const key = `exo_${jour}_${i}`;
+    const estFait = localStorage.getItem(key) === "true";
+    localStorage.setItem(key, !estFait);
+    
+    // On relance l'affichage pour voir le ✅ immédiatement
+    openCard(3); 
+}
+function calculerTotalSemaine() {
+    let total = 0;
+    const jours = [0, 1, 2, 3, 4, 5, 6]; // Dimanche à Samedi
+    jours.forEach(j => {
+        for (let i = 0; i < 5; i++) {
+            if (localStorage.getItem(`exo_${j}_${i}`) === "true") {
+                total++;
+            }
+        }
+    });
+    return total;
+}
+function editerProfil() {
+    const nouveauPseudo = prompt("Ton nouveau Pseudo :", localStorage.getItem('user_pseudo') || "");
+    const nouveauStyle = prompt("Ton style (ex: Manga, Semi-Réalisme, Concept Art) :", localStorage.getItem('user_style') || "");
+    
+    if (nouveauPseudo) localStorage.setItem('user_pseudo', nouveauPseudo);
+    if (nouveauStyle) localStorage.setItem('user_style', nouveauStyle);
+    
+    openCard(5); // Rafraîchir la vue
+}
+
+function changerAvatar() {
+    const avatars = ['🎨', '🖌️', '🖍️', '✏️', '✒️', '🖼️', '🎭', '👾'];
+    let actuel = localStorage.getItem('user_avatar') || '🎨';
+    let index = avatars.indexOf(actuel);
+    let suivant = avatars[(index + 1) % avatars.length];
+    
+    localStorage.setItem('user_avatar', suivant);
+    openCard(5); // Rafraîchir la vue
+}
