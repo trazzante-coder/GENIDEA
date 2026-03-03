@@ -379,7 +379,7 @@ circle.bg-circle {
 
 circle.progress-bar {
     fill: none;
-    stroke: #000;
+    stroke: #a855f7;
     stroke-width: 5;
     stroke-linecap: round;
     stroke-dasharray: 440; /* Périmètre du cercle (2 * PI * r) */
@@ -390,7 +390,7 @@ circle.progress-bar {
 .timer-circle {
     font-size: 1.2rem; /* Chiffres plus petits */
     font-weight: 400;
-    color: #888; /* Couleur plus discrète */
+    color: #fff; /* Couleur plus discrète */
     font-family: monospace;
     z-index: 2;
 }
@@ -424,16 +424,31 @@ circle.progress-bar {
 .time-btn {
     padding: 10px 20px;
     border-radius: 50px;
-    border: 1px solid #000;
-    background: transparent;
+    border: 1px solid #fff;
+    /* On baisse un peu l'opacité du fond pour que le blanc ressorte mieux */
+    background: rgba(255, 255, 255, 0.1) 
+    /* On force le blanc pur */
+    color: #ffffff !important; 
     cursor: pointer;
     font-weight: 700;
     transition: 0.2s;
+    text-shadow: 0 0 5px rgba(168, 85, 247, 0.5);
+    /* Optionnel : supprime la bordure par défaut qui peut être noire sur certains navigateurs */
+    outline: none;
 }
 
+/* Le style du bouton quand il est sélectionné */
+.time-btn.active {
+    background: #E74C3C !important; /* Ton rouge prestige */
+    border-color: #fff !important;
+    box-shadow: 0 0 15px rgba(231, 76, 60, 0.6);
+    transform: scale(1.1);
+    font-weight: bold;
+}
 .time-btn:hover {
-    background: #000;
+    background: #a855f7;
     color: #fff;
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
 }
 @keyframes bounceIn {
     0% { transform: scale(0.9); opacity: 0; }
@@ -730,7 +745,49 @@ body {
 .slot-box.locked .reel {
     opacity: 0.8;
 }
+/* --- STYLE DES EXERCICES (SECTION 3) --- */
+.exo-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 10px;
+}
 
+.exo-item {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 18px;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
 
+/* Quand l'exercice est validé */
+.exo-item.done {
+    background: rgba(39, 174, 96, 0.15); /* Fond vert léger */
+    border-left: 5px solid #27AE60;
+}
 
+.exo-text {
+    flex-grow: 1;
+}
 
+.exo-number {
+    font-size: 0.6rem;
+    opacity: 0.5;
+    text-transform: uppercase;
+    display: block;
+}
+
+.exo-title {
+    font-size: 0.95rem;
+    color: #fff;
+    font-weight: 500;
+}
+
+.exo-check {
+    font-size: 1.2rem;
+    margin-left: 15px;
+}
