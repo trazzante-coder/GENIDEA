@@ -118,7 +118,7 @@ function openCard(index) {
         </div>
 
         <div class="card-mini" style="margin-top: 20px; border: 1px solid ${estComplet ? '#27AE60' : '#D4AC0D'};">
-            <h3 style="color: #D4AC0D; font-size:0.8rem;">LE CERCLE DES 200</h3>
+            <h3 style="color: #D4AC0D; font-size:0.8rem;">DEFIS GENIDEA</h3>
             <p style="font-size: 0.7rem; margin: 10px 0; opacity: 0.5;">DÉFI :</p>
             <p style="font-weight: 700; color: #D4AC0D; margin-bottom:10px;">"${defiCercle}"</p>
             
