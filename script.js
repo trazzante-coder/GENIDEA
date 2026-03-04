@@ -218,14 +218,14 @@ else if (index === 3) { // SECTION ENTRAÎNEMENT
             </div>`;
     }
     else if (index === 5) { // SECTION PROFIL
-    const pseudo = localStorage.getItem('user_pseudo') || "Artiste Anonyme";
-    const styleArt = localStorage.getItem('user_style') || "Non défini";
-    const totalExos = calculerTotalSemaine();
-    const participeCercle = localStorage.getItem('cercle_deja_participe') === "true";
-    
-    // Calcul de la moyenne de génération (simulation basée sur un compteur)
-    const nbGenerations = parseInt(localStorage.getItem('stats_gen_total') || "0");
-    const moyenneHebdo = Math.round(nbGenerations / 4); // Estimation simple
+        const pseudo = localStorage.getItem('user_pseudo') || "Artiste Anonyme";
+        const styleArt = localStorage.getItem('user_style') || "Non défini";
+        const totalExos = calculerTotalSemaine();
+        const participeCercle = localStorage.getItem('cercle_deja_participe') === "true";
+        
+        // CORRECTION ICI : On récupère la valeur en temps réel
+        const nbGenerations = parseInt(localStorage.getItem('stats_gen_total') || "0");
+        const moyenneGen = (nbGenerations / 7).toFixed(1);
 
     dataZone.innerHTML = `
         <h2 class="category-title">MON PRESTIGE</h2>
@@ -240,12 +240,12 @@ else if (index === 3) { // SECTION ENTRAÎNEMENT
 
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:20px;">
             <div class="card-mini" style="padding:10px; text-align:center; background:rgba(255,255,255,0.03);">
-                <span style="font-size:0.6rem; opacity:0.5; display:block;">GÉNÉRATIONS / SEM</span>
-                <strong style="color:#a855f7; font-size:1.2rem;">${moyenneHebdo}</strong>
+                <span style="font-size:0.6rem; opacity:0.5; display:block;">TOTAL GÉNÉRATIONS</span>
+                <strong style="color:#a855f7; font-size:1.2rem;">${nbGenerations}</strong>
             </div>
             <div class="card-mini" style="padding:10px; text-align:center; background:rgba(255,255,255,0.03);">
-                <span style="font-size:0.6rem; opacity:0.5; display:block;">EXERCICES / 35</span>
-                <strong style="color:#27AE60; font-size:1.2rem;">${totalExos}</strong>
+                <span style="font-size:0.6rem; opacity:0.5; display:block;">MOYENNE / J</span>
+                <strong style="color:#27AE60; font-size:1.2rem;">${moyenneGen}</strong>
             </div>
         </div>
 
@@ -258,15 +258,26 @@ else if (index === 3) { // SECTION ENTRAÎNEMENT
                 </span>
             </div>
         </div>
+     
+        <div style="margin-top:20px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px; text-align:center;">
+            <button class="launch-btn" onclick="exporterDonnees()" style="background:rgba(255,255,255,0.1) !important; font-size:0.7rem;">
+                💾 GÉNÉRER MON CODE DE RÉCUPÉRATION
+            </button>
+            <p style="font-size:0.55rem; opacity:0.4; margin-top:10px; line-height:1.2;">
+                Copie ce code pour ne pas perdre ton Prestige en changeant de téléphone.
+            </p>
+            <textarea id="notes-profil" class="notes-prestige" placeholder="Tes objectifs de la semaine..."></textarea>
+        </div>
+    `; // On ferme le template string ici
 
-        <textarea id="notes-profil" class="notes-prestige" placeholder="Tes objectifs de la semaine..."></textarea>
-    `;
-
-    // Sauvegarde des notes
+    // Sauvegarde des notes (Vérifie que c'est bien APRES l'injection du innerHTML)
     const notes = document.getElementById('notes-profil');
-    notes.value = localStorage.getItem('notesPrestige') || "";
-    notes.oninput = () => localStorage.setItem('notesPrestige', notes.value);
-}
+    if (notes) {
+        notes.value = localStorage.getItem('notesPrestige') || "";
+        notes.oninput = () => localStorage.setItem('notesPrestige', notes.value);
+    }
+} // Fin de l'index 5
+
    overlay.classList.add('active'); // LA LIGNE QUI OUVRE ENFIN LA FENÊTRE
 } // FIN DE LA FONCTION OPENCARD
 
@@ -327,6 +338,8 @@ function renderSlots() {
 }
 
 function spinSlots() {
+    let totalGen = parseInt(localStorage.getItem('stats_gen_total') || "0");
+    localStorage.setItem('stats_gen_total', totalGen + 1);
     const h = 60; // Hauteur d'une option
     const activeData = MODES.drawing.allColumns.filter(c => selectedCols.includes(c.id));
 
@@ -528,6 +541,9 @@ function resetTimer() {
 }
 
 function genererAutoPrestige() {
+    // AJOUT : On incrémente le compteur global
+    let totalGen = parseInt(localStorage.getItem('stats_gen_total') || "0");
+    localStorage.setItem('stats_gen_total', totalGen + 1);
     // 1. On récupère tous les IDs de colonnes sauf le "sujet"
     const otherIds = MODES.drawing.allColumns
         .map(c => c.id)
@@ -548,6 +564,10 @@ function genererAutoPrestige() {
     
     // 6. On lance le spin après un court délai pour l'effet visuel
     setTimeout(spinSlots, 100);
+
+    // On force le rafraîchissement visuel du profil si on est dessus
+    if (document.getElementById('notes-profil')) {
+    openCard(5); }
 }
 // --- FONCTIONS UTILITAIRES ---
 
@@ -670,4 +690,27 @@ function changerAvatar() {
     
     localStorage.setItem('user_avatar', suivant);
     openCard(5); // Rafraîchir la vue
+}
+function exporterDonnees() {
+    // On récupère tout ce qui commence par "user_", "exo_" ou "cercle_"
+    const backup = {};
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('user_') || key.startsWith('exo_') || key.startsWith('cercle_') || key === 'notesPrestige') {
+            backup[key] = localStorage.getItem(key);
+        }
+    }
+
+    const codeSecret = btoa(JSON.stringify(backup)); // On transforme en code "secret" (base64)
+    
+    // On affiche le code dans une alerte ou un prompt pour qu'il puisse le copier
+    const inputStyle = "width:100%; padding:10px; background:#222; color:#27AE60; border:1px solid #27AE60; font-family:monospace; margin-top:10px;";
+    
+    const dataZone = document.getElementById('category-data');
+    dataZone.innerHTML = `
+        <h2 class="category-title">SAUVEGARDE</h2>
+        <p style="font-size:0.8rem; margin-bottom:20px;">Copie ce code et garde-le précieusement :</p>
+        <textarea readonly style="${inputStyle}" rows="8">${codeSecret}</textarea>
+        <button class="launch-btn" onclick="openCard(5)" style="margin-top:20px;">RETOUR AU PROFIL</button>
+    `;
 }
