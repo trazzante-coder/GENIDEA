@@ -1,84 +1,10 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GEN DESSIN | PRESTIGE</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-<body>
-
-    <header class="top-bar">
-        <h1>GENIDEA<br>DESSIN</h1>
-        <p class="tagline">L'OUTIL ULTIME DES CRÉATIFS</p>
-    </header>
-
-    <main class="carousel-section">
-    <div class="scene">
-        <div class="carousel" id="carousel">
-            <div class="item active">
-                <div class="card-content">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i>
-                    <h3>GÉNÉRATEUR</h3>
-                    <p>CONCEPTION CRÉATIVE</p>
-                </div>
+<div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:20px;">
+            <div class="card-mini" style="padding:10px; text-align:center; background:rgba(255,255,255,0.03);">
+                <span style="font-size:0.6rem; opacity:0.5; display:block;">TOTAL GÉNÉRATIONS</span>
+                <strong style="color:#a855f7; font-size:1.2rem;">${nbGenerations}</strong>
             </div>
-
-            <div class="item">
-                <div class="card-content">
-                    <i class="fa-solid fa-stopwatch-20"></i>
-                    <h3>CHRONO</h3>
-                    <p>MAÎTRISE DU TEMPS</p>
-                </div>
-            </div>
-
-            <div class="item">
-                <div class="card-content">
-                    <i class="fa-solid fa-bolt-lightning"></i>
-                    <h3>CHALLENGE</h3>
-                    <p>DÉFI QUOTIDIEN</p>
-                </div>
-            </div>
-
-            <div class="item">
-                <div class="card-content">
-                    <i class="fa-solid fa-list-check"></i>
-                    <h3>EXERCICES</h3>
-                    <p>DISCIPLINE & TECHNIQUE</p>
-                </div>
-            </div>
-
-            <div class="item">
-                <div class="card-content">
-                    <i class="fa-solid fa-trophy" style="color: #D4AC0D;"></i>
-                    <h3>RESULTATS</h3>
-                    <p>SUIVI DES GAGNANTS</p>
-                </div>
-            </div>
-
-            <div class="item">
-                <div class="card-content">
-                    <i class="fa-solid fa-fingerprint"></i>
-                    <h3>PROFIL</h3>
-                    <p>ESPACE PERSONNEL</p>
-                </div>
+            <div class="card-mini" style="padding:10px; text-align:center; background:rgba(255,255,255,0.03);">
+                <span style="font-size:0.6rem; opacity:0.5; display:block;">MOYENNE / J</span>
+                <strong style="color:#27AE60; font-size:1.2rem;">${moyenneGen}</strong>
             </div>
         </div>
-    </div>
-</main>
-
-   <button class="nav-btn left" onclick="rotate(-1)">‹</button>
-    <button class="nav-btn right" onclick="rotate(1)">›</button>
-    
-    <div class="dots" id="dots"></div>
-
-    <div id="content-overlay" class="overlay">
-        <button class="close-btn" onclick="closeCard()">×</button>
-        <div id="category-data"></div>
-    </div>
-
-    <script src="script.js"></script>
-</body>
-</html>
