@@ -77,7 +77,9 @@ function openCard(index) {
     const dataZone = document.getElementById('category-data');
     dataZone.innerHTML = ""; 
 
-    if (index === 0) renderGenerator(dataZone); 
+    if (index === 0) {
+        renderGenerator(dataZone); 
+    }
     else if (index === 1) renderChrono(dataZone);
     else if (index === 2) { // SECTION CHALLENGES
     const cols = MODES.drawing.allColumns;
@@ -282,32 +284,52 @@ else if (index === 3) { // SECTION ENTRAÎNEMENT
 } // FIN DE LA FONCTION OPENCARD
 
 function renderGenerator(container) {
-    // 1. On prépare le début de la carte (Titre et Menu de sélection)
     let menuHtml = `
-        <h2 class="category-title">GÉNÉRATEUR</h2>
-        <p class="category-subtitle">Configurez vos colonnes</p>
+        <h2 class="category-title">GUIDE GENIDEA</h2>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px;">
+            <div style="padding:8px; border-radius:10px; text-align:left; background:rgba(168, 85, 247, 0.1); border:1px solid rgba(168, 85, 247, 0.2);">
+                <span style="font-size:0.6rem; color:#a855f7; font-weight:bold;">🎨 GÉNÉRATEUR</span>
+                <p style="font-size:0.5rem; margin:3px 0; opacity:0.8; line-height:1.1;">Crée des concepts uniques en un clic.</p>
+            </div>
+            <div style="padding:8px; border-radius:10px; text-align:left; background:rgba(39, 174, 96, 0.1); border:1px solid rgba(39, 174, 96, 0.2);">
+                <span style="font-size:0.6rem; color:#27AE60; font-weight:bold;">⏱️ CHRONO</span>
+                <p style="font-size:0.5rem; margin:3px 0; opacity:0.8; line-height:1.1;">Entraîne ta vitesse avec des défis flash.</p>
+            </div>
+            <div style="padding:8px; border-radius:10px; text-align:left; background:rgba(212, 172, 13, 0.1); border:1px solid rgba(212, 172, 13, 0.2);">
+                <span style="font-size:0.6rem; color:#D4AC0D; font-weight:bold;">🏆 CHALLENGES</span>
+                <p style="font-size:0.5rem; margin:3px 0; opacity:0.8; line-height:1.1;">Rejoins le Cercle et progresse ensemble.</p>
+            </div>
+            <div style="padding:8px; border-radius:10px; text-align:left; background:rgba(255, 255, 255, 0.05); border:1px solid rgba(255, 255, 255, 0.1);">
+                <span style="font-size:0.6rem; color:#fff; font-weight:bold;">📈 PRESTIGE</span>
+                <p style="font-size:0.5rem; margin:3px 0; opacity:0.8; line-height:1.1;">Cumule des points sur ton profil.</p>
+            </div>
+        </div>
+
+        <div style="text-align:center; margin-bottom:15px;">
+            <a href="mailto:contact@genidea.visual" style="text-decoration:none; font-size:0.55rem; color:#a855f7; opacity:0.7; font-weight:bold;">
+                📩 UNE IDÉE ? CONTACTE L'ATELIER GENIDEA
+            </a>
+        </div>
+
+        <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin-bottom:15px;">
+
+        <p class="category-subtitle">CONFIGURE TES COLONNES</p>
         <div class="selector-menu">`;
     
-    // 2. On crée les petits boutons (Sujet, Action...) pour choisir ses colonnes
     MODES.drawing.allColumns.forEach(col => {
         const activeClass = selectedCols.includes(col.id) ? 'active' : '';
         menuHtml += `<button class="col-btn ${activeClass}" onclick="toggleColumn('${col.id}')">${col.l}</button>`;
     });
 
-    // 3. On ferme le menu et on prépare la zone où les slots vont s'afficher
-    // C'est ici qu'on ajoute notre nouveau groupe de boutons (LANCER + AUTO)
     menuHtml += `</div>
                  <div id="active-slots" class="slots-container"></div>
-                 
                  <div class="btn-group-gen" style="display: flex; gap: 10px; margin-top: 20px;">
                     <button class="launch-btn" style="flex: 3; margin-top:0;" onclick="spinSlots()">✨ LANCER LE TIRAGE</button>
                     <button class="auto-btn-prestige" style="flex: 1; background: #eee; border: none; border-radius: 15px; cursor: pointer; font-size: 1.2rem;" onclick="genererAutoPrestige()">🎲 AUTO</button>
                  </div>`;
     
-    // 4. On injecte tout le texte HTML d'un coup dans l'overlay
     container.innerHTML = menuHtml;
-
-    // 5. On demande à l'autre fonction de dessiner les slots (les rouleaux)
     renderSlots();
 }
 
