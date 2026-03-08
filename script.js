@@ -3,18 +3,21 @@ const items = document.querySelectorAll('.item');
 const dotsContainer = document.getElementById('dots');
 let currDeg = 0;
 let activeIdx = 0;
-let timerId = null; // Cette variable va stocker le compte à rebours pour pouvoir l'arrêter
+let timerId = null;
+let indexAstuce = 0;       // AJOUTÉ : indispensable
+let intervalleGuide = null; // AJOUTÉ : indispensable
 
 function init() {
     const gapAngle = 360 / items.length;
-    // On réduit encore un peu le TZ sur mobile pour que les cartes de côté ne touchent pas les bords
+    // On garde ton réglage qui fonctionne
     const tz = window.innerWidth < 768 ? 220 : 500; 
 
     items.forEach((item, i) => {
         const angle = i * gapAngle;
         item.style.transform = `rotateY(${angle}deg) translateZ(${tz}px)`;
         
-        if (dotsContainer.children.length < items.length) {
+        // On évite de recréer les points si on redimensionne (resize)
+        if (dotsContainer && dotsContainer.children.length < items.length) {
             const d = document.createElement('div');
             d.className = `dot ${i === 0 ? 'active' : ''}`;
             dotsContainer.appendChild(d);
@@ -59,10 +62,10 @@ document.querySelectorAll('.item').forEach((item, index) => {
 const MODES = {
     drawing: { 
         allColumns: [
-            {id: "sujet", l:"Sujet", i:["Chevalier", "Robot", "Pirate", "Cyborg", "Samouraï", "Astronaute", "Monstre","chien","chat","enfant","voiture","vélo","tasse","chaise","vieux monsieur","vieille dame","souris","tortue","poisson","pauvre","riche"]},
-            {id: "action", l:"Action", i:["En plein combat", "Qui dort", "Qui mange", "En train de courir", "Qui danse","assis","bois","mange","rigole","pleure","étonné","triste"]},
-            {id: "lieu", l:"Lieu", i:["Forêt", "Espace", "Enfers", "Cyber-ville", "Plage", "Désert","Un bar","dans un salon","dans une cuisine","Egypte","Italie","France","Paradis","Terrain de foot","Balcon"]},
-            {id: "style", l:"Style", i:["Manga", "Comics", "Réaliste", "Pixel Art", "Aquarelle","BD","Marvel","Caricature","Horreur","fin"]},
+            {id: "sujet", l:"Sujet", i:["Chevalier", "Robot", "Pirate", "Cyborg", "Samouraï", "Astronaute", "Monstre","Chien","Chat","Enfant","Voiture","Vélo","Tasse","Chaise","Vieux monsieur","Vieille dame","Souris","Tortue","Poisson","Pauvre","Riche"]},
+            {id: "action", l:"Action", i:["En plein combat", "Qui dort", "Qui mange", "En train de courir", "Qui danse","Assis","bBois","Mange","Rigole","Pleure","Etonné","Triste"]},
+            {id: "lieu", l:"Lieu", i:["Forêt", "Espace", "Enfers", "Cyber-ville", "Plage", "Désert","Un bar","Dans un salon","Dans une cuisine","Egypte","Italie","France","Paradis","Terrain de foot","Balcon"]},
+            {id: "style", l:"Style", i:["Manga", "Comics", "Réaliste", "Pixel Art", "Aquarelle","BD","Marvel","Caricature","Horreur","Fin","Simpsons","Bob l'éponge"]},
             {id: "couleur", l:"Palette", i:["Néon/Noir", "Pastel/Gris", "Or/Noir", "Rouge/Blanc","orange/bleu","bleu/vert","bleu/rouge","bleu/jaune","bleu/noir","rouge/vert","rouge/orange","rouge/gris","rouge/jaune","rouge/noir","rouge/blanc"]},
             {id: "meteo", l:"Météo", i:["Orage", "Brouillard", "Plein soleil", "Pluie acide","Gris","Canicule","Neige","Blizard"]},
             {id: "accessoire", l:"Objet", i:["Épée laser", "Livre ancien", "Masque", "Gants de boxe","Seringue","Cannette","Chapeau","Bonnet","Bague","Boucle d'oreille","Short","Bandana","Fusil","Lunette","Masque","Casquette","Baton"]}
@@ -120,7 +123,7 @@ function openCard(index) {
         </div>
 
         <div class="card-mini" style="margin-top: 20px; border: 1px solid ${estComplet ? '#27AE60' : '#D4AC0D'};">
-            <h3 style="color: #D4AC0D; font-size:0.8rem;">DEFIS GENIDEA</h3>
+            <h3 style="color: #D4AC0D; font-size:0.8rem;">DÉFI GENIDEA 200</h3>
             <p style="font-size: 0.7rem; margin: 10px 0; opacity: 0.5;">DÉFI :</p>
             <p style="font-weight: 700; color: #D4AC0D; margin-bottom:10px;">"${defiCercle}"</p>
             
@@ -129,7 +132,7 @@ function openCard(index) {
             </div>
 
             <div id="reglement-zone" style="display:none; background:rgba(0,0,0,0.3); padding:15px; border-radius:12px; margin-bottom:15px; text-align:left; border:1px solid rgba(212, 172, 13, 0.2);">
-                <h4 style="font-size:0.6rem; color:#D4AC0D; margin-top:0; letter-spacing:1px;">RÈGLES DE L'ATELIER</h4>
+                <h4 style="font-size:0.6rem; color:#D4AC0D; margin-top:0; letter-spacing:1px;">RÈGLES DU DÉFI</h4>
                 <ul style="font-size:0.55rem; color:#eee; padding-left:15px; line-height:1.4; margin-bottom:0;">
                     <li>Une seule participation par artiste.</li>
                     <li>Le dessin doit inclure TOUS les éléments du défi.</li>
@@ -203,7 +206,7 @@ else if (index === 3) { // SECTION ENTRAÎNEMENT
 
         dataZone.innerHTML = `
             <h2 class="category-title">GALERIE</h2>
-            <p class="category-subtitle">Les Maîtres du Cercle</p>
+            <p class="category-subtitle">Les derniers gagnant du challenge 200 GENIDEA</p>
             <div class="grille-prestige">
                 ${gagnants.map(g => `
                     <div class="gallery-card">
@@ -268,6 +271,9 @@ else if (index === 3) { // SECTION ENTRAÎNEMENT
             <p style="font-size:0.55rem; opacity:0.4; margin-top:10px; line-height:1.2;">
                 Copie ce code pour ne pas perdre ton Prestige en changeant de téléphone.
             </p>
+            <button class="launch-btn" onclick="reouvrirGuide()" style="background:rgba(168, 85, 247, 0.2) !important; color:#a855f7 !important; border:1px solid #a855f7 !important; margin-top:10px; font-size:0.65rem;">
+    ✨ RÉACTIVER LE GUIDE CONSEILS
+</button>
             <textarea id="notes-profil" class="notes-prestige" placeholder="Tes objectifs de la semaine..."></textarea>
         </div>
     `; // On ferme le template string ici
@@ -285,34 +291,6 @@ else if (index === 3) { // SECTION ENTRAÎNEMENT
 
 function renderGenerator(container) {
     let menuHtml = `
-        <h2 class="category-title">GUIDE GENIDEA</h2>
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px;">
-            <div style="padding:8px; border-radius:10px; text-align:left; background:rgba(168, 85, 247, 0.1); border:1px solid rgba(168, 85, 247, 0.2);">
-                <span style="font-size:0.6rem; color:#a855f7; font-weight:bold;">🎨 GÉNÉRATEUR</span>
-                <p style="font-size:0.5rem; margin:3px 0; opacity:0.8; line-height:1.1;">Crée des concepts uniques en un clic.</p>
-            </div>
-            <div style="padding:8px; border-radius:10px; text-align:left; background:rgba(39, 174, 96, 0.1); border:1px solid rgba(39, 174, 96, 0.2);">
-                <span style="font-size:0.6rem; color:#27AE60; font-weight:bold;">⏱️ CHRONO</span>
-                <p style="font-size:0.5rem; margin:3px 0; opacity:0.8; line-height:1.1;">Entraîne ta vitesse avec des défis flash.</p>
-            </div>
-            <div style="padding:8px; border-radius:10px; text-align:left; background:rgba(212, 172, 13, 0.1); border:1px solid rgba(212, 172, 13, 0.2);">
-                <span style="font-size:0.6rem; color:#D4AC0D; font-weight:bold;">🏆 CHALLENGES</span>
-                <p style="font-size:0.5rem; margin:3px 0; opacity:0.8; line-height:1.1;">Rejoins le Cercle et progresse ensemble.</p>
-            </div>
-            <div style="padding:8px; border-radius:10px; text-align:left; background:rgba(255, 255, 255, 0.05); border:1px solid rgba(255, 255, 255, 0.1);">
-                <span style="font-size:0.6rem; color:#fff; font-weight:bold;">📈 PRESTIGE</span>
-                <p style="font-size:0.5rem; margin:3px 0; opacity:0.8; line-height:1.1;">Cumule des points sur ton profil.</p>
-            </div>
-        </div>
-
-        <div style="text-align:center; margin-bottom:15px;">
-            <a href="mailto:contact@genidea.visual" style="text-decoration:none; font-size:0.55rem; color:#a855f7; opacity:0.7; font-weight:bold;">
-                📩 UNE IDÉE ? CONTACTE L'ATELIER GENIDEA
-            </a>
-        </div>
-
-        <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin-bottom:15px;">
 
         <p class="category-subtitle">CONFIGURE TES COLONNES</p>
         <div class="selector-menu">`;
@@ -390,25 +368,28 @@ function renderChrono(container) {
         <h2 class="category-title">CHRONO</h2>
         <p class="category-subtitle">Discipline & Rapidité</p>
         
-        <div class="chrono-setup">
-            <div class="timer-container">
-                <svg class="timer-svg" viewBox="0 0 160 160">
-                    <circle class="bg-circle" cx="80" cy="80" r="70"></circle>
-                    <circle id="progress-bar" class="progress-bar" cx="80" cy="80" r="70"></circle>
+        <div class="chrono-wrapper" style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+            
+            <div class="timer-container" style="position: relative; width: 160px; height: 160px;">
+                <svg class="timer-svg" viewBox="0 0 160 160" style="transform: rotate(-90deg);">
+                    <circle class="bg-circle" cx="80" cy="80" r="70" style="fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 8;"></circle>
+                    <circle id="progress-bar" class="progress-bar" cx="80" cy="80" r="70" style="fill: none; stroke: #a855f7; stroke-width: 8; stroke-dasharray: 440; stroke-dashoffset: 440; transition: stroke-dashoffset 1s linear;"></circle>
                 </svg>
-                <div id="chrono-display" class="timer-circle">05:00</div>
+                <div id="chrono-display" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.5rem; font-weight: bold; color: #fff;">05:00</div>
             </div>
             
-            <div id="challenge-box" class="challenge-display">Prêt pour un défi flash ?</div>
+            <div id="challenge-box" class="challenge-display" style="width: 100%; min-height: 80px; padding: 15px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; text-align: center;">
+                Prêt pour un défi flash ?
+            </div>
             
-            <div class="time-presets">
+            <div class="time-presets" style="display: flex; gap: 10px;">
                 <button class="time-btn" onclick="setTime(30)">30s</button>
                 <button class="time-btn" onclick="setTime(60)">1m</button>
                 <button class="time-btn" onclick="setTime(180)">3m</button>
                 <button class="time-btn" onclick="setTime(300)">5m</button>
             </div>
             
-            <button class="launch-btn" onclick="startChronoSession()">LANCER LE DÉFI</button>
+            <button class="launch-btn" onclick="startChronoSession()" style="width: 100%; margin-top: 10px;">LANCER LE DÉFI</button>
         </div>
     `;
     updateTimerDisplay();
@@ -736,3 +717,98 @@ function exporterDonnees() {
         <button class="launch-btn" onclick="openCard(5)" style="margin-top:20px;">RETOUR AU PROFIL</button>
     `;
 }
+
+
+// 2. LE TABLEAU DE TEXTES (Indispensable pour que ça s'affiche)
+const astucesAtelier = [
+    "Bienvenue sur GENIDEA VISUAL",
+    "Astuce : Utilise le swipe pour naviguer dans le carrousel.",
+    "Le saviez-vous ? Chaque carte contient des ressources uniques.",
+    "Clique sur le centre d'une carte pour l'explorer.",
+    "Le Générateur --> Génere une idée par rapport à tes choix ou laisse toi surprendre avec le mode AUTO",
+    "Le Chrono est un entrainement de vitesse suivant une génération AUTO",
+    "Le Challenge te propose un challenge quotidien et un challenge avec un max de 200 participants! ",
+    "Les Excercises sont 5 excercises différents a faire par jour",
+    "Le Résultat, c'est la que tu verras les gagnants du concours 200!",
+    "Profil, tu pourra me réactiver et suivre ton activité"
+];
+
+// 3. LOGIQUE DU GUIDE
+function lancerCycleGuide() {
+    const guideZone = document.getElementById('guide-accueil');
+    const texteZone = document.getElementById('guide-texte');
+    
+    if (!guideZone || !texteZone) return;
+
+    if (localStorage.getItem('guide_masque_final') === 'true') {
+        guideZone.style.display = 'none';
+        return;
+    }
+
+    guideZone.style.display = 'block'; 
+    guideZone.style.opacity = '1';
+
+    const changerTexte = () => {
+        if (!texteZone) return;
+        texteZone.style.opacity = 0;
+        
+        setTimeout(() => {
+            indexAstuce = (indexAstuce + 1) % astucesAtelier.length;
+            texteZone.innerText = astucesAtelier[indexAstuce];
+            texteZone.style.opacity = 1;
+        }, 500);
+    };
+
+    // Premier texte immédiat
+    texteZone.innerText = astucesAtelier[0];
+
+    if (intervalleGuide) clearInterval(intervalleGuide);
+    intervalleGuide = setInterval(changerTexte, 4000);
+}
+
+function fermerDefinitifGuide() {
+    const guide = document.getElementById('guide-accueil');
+    if (guide) {
+        guide.style.opacity = '0';
+        setTimeout(() => {
+            guide.style.display = 'none';
+            localStorage.setItem('guide_masque_final', 'true');
+            clearInterval(intervalleGuide);
+            intervalleGuide = null; 
+        }, 400);
+    }
+}
+
+function reouvrirGuide() {
+    localStorage.removeItem('guide_masque_final');
+    lancerCycleGuide();
+}
+
+// 4. GESTION DES COMPTES (Versions uniques)
+function ouvrirMenuConnexion() {
+    document.getElementById('auth-modal-overlay').style.display = 'flex';
+    document.getElementById('modal-connexion').style.display = 'block';
+    document.getElementById('modal-inscription').style.display = 'none';
+}
+
+function ouvrirMenuInscription() {
+    document.getElementById('auth-modal-overlay').style.display = 'flex';
+    document.getElementById('modal-connexion').style.display = 'none';
+    document.getElementById('modal-inscription').style.display = 'block';
+}
+
+function fermerModales() {
+    document.getElementById('auth-modal-overlay').style.display = 'none';
+}
+
+function auth(type) {
+    console.log("Action : " + type);
+    alert("Le système d'authentification " + type + " sera bientôt activé !");
+    fermerModales();
+}
+
+// 5. LANCEMENT GLOBAL
+window.addEventListener('load', () => {
+    if (typeof init === "function") init(); 
+    lancerCycleGuide();
+});
