@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GENIDEA VISUAL</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
@@ -10,10 +11,35 @@
 </head>
 <body>
 
+<div style="position: fixed; top: 15px; right: 15px; z-index: 1000; display: flex; gap: 10px; align-items: center;">
+    
+    <button onclick="ouvrirMenuConnexion()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #ccc; padding: 7px 14px; border-radius: 12px; font-size: 0.65rem; cursor: pointer; backdrop-filter: blur(8px); letter-spacing: 0.5px; transition: all 0.3s;">
+        CONNEXION
+    </button>
+    
+    <button onclick="ouvrirMenuInscription()" style="background: linear-gradient(45deg, #a855f7, #7e22ce); border: none; color: white; padding: 8px 16px; border-radius: 12px; font-size: 0.65rem; cursor: pointer; font-weight: 900; box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4); letter-spacing: 0.5px; transition: all 0.3s;">
+        REJOINDRE
+    </button>
+    
+</div>
+
     <header class="top-bar">
         <h1>GENIDEA<br>DESSIN</h1>
         <p class="tagline">L'OUTIL ULTIME DES CRÉATIFS</p>
     </header>
+
+    <div id="guide-accueil" style="position: fixed; top: 18%; left: 50%; transform: translateX(-50%); width: 85%; max-width: 380px; background: rgba(15, 15, 15, 0.95); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 24px; padding: 22px; z-index: 900; backdrop-filter: blur(20px); box-shadow: 0 25px 50px rgba(0,0,0,0.6); text-align: center; display: none;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="width: 8px; height: 8px; background: #a855f7; border-radius: 50%; box-shadow: 0 0 8px #a855f7;"></div>
+            <span style="color: #a855f7; font-weight: 900; font-size: 0.6rem; letter-spacing: 1.5px; text-transform: uppercase;">Conseil de GENIDEA</span>
+        </div>
+        <button onclick="fermerDefinitifGuide()" style="background: rgba(255,255,255,0.05); border: none; color: #fff; cursor: pointer; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">&times;</button>
+    </div>
+    
+    <p id="guide-texte" style="font-size: 0.85rem; line-height: 1.6; color: #fff; margin: 0; min-height: 80px; transition: opacity 0.5s ease; opacity: 1;">
+    </p>
+</div>
 
     <main class="carousel-section">
     <div class="scene">
@@ -38,7 +64,7 @@
                 <div class="card-content">
                     <i class="fa-solid fa-bolt-lightning"></i>
                     <h3>CHALLENGE</h3>
-                    <p>DÉFI QUOTIDIEN</p>
+                    <p>DÉFI QUOTIDIEN & DÉFI 200 </p>
                 </div>
             </div>
 
@@ -54,7 +80,7 @@
                 <div class="card-content">
                     <i class="fa-solid fa-trophy" style="color: #D4AC0D;"></i>
                     <h3>RESULTATS</h3>
-                    <p>SUIVI DES GAGNANTS</p>
+                    <p>SUIVI DES GAGNANTS DU DÉFI 200</p>
                 </div>
             </div>
 
@@ -78,6 +104,28 @@
         <button class="close-btn" onclick="closeCard()">×</button>
         <div id="category-data"></div>
     </div>
+
+    
+    <div id="auth-modal-overlay" onclick="fermerModales()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); backdrop-filter:blur(10px); z-index:2000; align-items:center; justify-content:center;">
+    
+    <div id="modal-connexion" class="auth-card" onclick="event.stopPropagation()">
+        <h2 style="color:#a855f7; margin-bottom:20px; font-size:1.2rem; letter-spacing:2px;">CONNEXION</h2>
+        <button onclick="auth('Google')" class="btn-auth-google">
+            <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="18" style="margin-right:10px;"> Continuer avec Google
+        </button>
+        <div style="margin:15px 0; color:#555; font-size:0.7rem;">OU</div>
+        <input type="email" id="email-connexion" placeholder="Ton email" class="auth-input">
+        <button onclick="auth('Email')" class="btn-auth-main">RECEVOIR LE LIEN</button>
+    </div>
+
+    <div id="modal-inscription" class="auth-card" onclick="event.stopPropagation()" style="display:none;">
+        <h2 style="color:#27AE60; margin-bottom:10px; font-size:1.2rem; letter-spacing:2px;">REJOINDRE</h2>
+        <p style="font-size:0.75rem; color:#aaa; margin-bottom:20px;">Crée ton profil pour sauvegarder ton prestige et participer au Cercle.</p>
+        <input type="text" placeholder="Pseudo d'artiste" class="auth-input">
+        <input type="email" placeholder="Email" class="auth-input">
+        <button onclick="auth('Inscription')" class="btn-auth-main" style="background:#27AE60;">CRÉER MON COMPTE</button>
+    </div>
+</div>
 
     <script src="script.js"></script>
 </body>
