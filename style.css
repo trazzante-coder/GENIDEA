@@ -355,7 +355,7 @@ body {
 
 /* --- CERCLE DE PROGRESSION --- */
 .timer-container {
-    position: relative;
+    position: absolute;
     width: 180px;
     height: 180px;
     display: flex;
@@ -790,4 +790,59 @@ body {
 .exo-check {
     font-size: 1.2rem;
     margin-left: 15px;
+}
+.auth-card {
+    background: rgba(20, 20, 20, 0.95);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    padding: 30px;
+    border-radius: 24px;
+    width: 90%;
+    max-width: 340px;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+}
+
+.auth-input {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 12px;
+    border-radius: 12px;
+    color: white;
+    margin-bottom: 12px;
+    outline: none;
+}
+
+.btn-auth-google {
+    width: 100%;
+    background: white;
+    color: #333;
+    border: none;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.btn-auth-main {
+    width: 100%;
+    background: #a855f7;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+}
+html, body {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden; /* Crucial pour éviter le décalage sur le côté */
+    display: flex;
+    justify-content: center;
 }
